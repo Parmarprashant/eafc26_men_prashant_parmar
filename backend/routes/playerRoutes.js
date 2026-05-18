@@ -26,6 +26,9 @@ const {
   getTopDefenders,
   getTopPhysical,
   getRecentPlayers,
+  getTrendingPlayers,
+  getTopYoungsters,
+  getDreamTeam,
   getPlayerPerformance,
   bulkUpdatePlayers,
   bulkDeletePlayers,
@@ -37,9 +40,15 @@ const router = express.Router();
 
 const { protect, authorize } = require('../middlewares/auth');
 
+// HEAD and OPTIONS support for the main players collection
 router.route('/')
   .get(getPlayers)
-  .post(protect, authorize('admin'), createPlayer);
+  .post(protect, authorize('admin'), createPlayer)
+  .head((req, res) => res.status(200).end())
+  .options((req, res) => {
+    res.setHeader('Allow', 'GET, POST, HEAD, OPTIONS');
+    res.status(200).end();
+  });
 
 router.route('/exists/:id').get(checkPlayerExists);
 router.route('/name/:name').get(getPlayerByName);
@@ -61,8 +70,11 @@ router.route('/top-passers').get(getTopPassers);
 router.route('/top-defenders').get(getTopDefenders);
 router.route('/top-physical').get(getTopPhysical);
 router.route('/top-finishers').get(getTopFinishers);
+router.route('/top-youngsters').get(getTopYoungsters);
 router.route('/recent').get(getRecentPlayers);
+router.route('/trending').get(getTrendingPlayers);
 router.route('/random').get(getRandomPlayer);
+router.route('/dream-team').get(getDreamTeam);
 router.route('/performance/:id').get(getPlayerPerformance);
 
 router.route('/bulk-create')
@@ -74,10 +86,16 @@ router.route('/bulk-update')
 router.route('/bulk-delete')
   .delete(protect, authorize('admin'), bulkDeletePlayers);
 
+// HEAD and OPTIONS for single player resource
 router.route('/:id')
   .get(getPlayer)
   .put(protect, authorize('admin'), updatePlayer)
   .patch(protect, authorize('admin'), patchPlayer)
-  .delete(protect, authorize('admin'), deletePlayer);
+  .delete(protect, authorize('admin'), deletePlayer)
+  .head((req, res) => res.status(200).end())
+  .options((req, res) => {
+    res.setHeader('Allow', 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS');
+    res.status(200).end();
+  });
 
 module.exports = router;
