@@ -36,6 +36,8 @@ const {
   getRandomPlayer
 } = require('../controllers/playerController');
 
+const { comparePlayers } = require('../controllers/statsController');
+
 const router = express.Router();
 
 const { protect, authorize } = require('../middlewares/auth');
@@ -76,6 +78,19 @@ router.route('/trending').get(getTrendingPlayers);
 router.route('/random').get(getRandomPlayer);
 router.route('/dream-team').get(getDreamTeam);
 router.route('/performance/:id').get(getPlayerPerformance);
+router.route('/stats/:id').get(getPlayerPerformance); // Alias for stats
+
+router.route('/skill-moves/:value').get((req, res, next) => {
+  req.query.skillMoves = req.params.value;
+  getPlayers(req, res, next);
+});
+
+router.route('/weak-foot/:value').get((req, res, next) => {
+  req.query.weakFoot = req.params.value;
+  getPlayers(req, res, next);
+});
+
+router.route('/compare/:p1/:p2').get(comparePlayers);
 
 router.route('/bulk-create')
   .post(protect, authorize('admin'), bulkCreatePlayers);
