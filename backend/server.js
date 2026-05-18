@@ -13,6 +13,7 @@ connectDB();
 // Route files
 const players = require('./routes/playerRoutes');
 const stats = require('./routes/statsRoutes');
+const auth = require('./routes/authRoutes');
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use(cors());
 // Mount routers
 app.use('/api/v1/players', players);
 app.use('/api/v1/stats', stats);
+app.use('/api/v1/auth', auth);
 
 // Error handler middleware
 app.use(errorHandler);
