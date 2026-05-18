@@ -317,12 +317,43 @@ exports.getPlayersByAltPosition = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, count: players.length, data: players });
 });
 
-// @desc    Fetch fastest players (alias for top-paced)
-// @route   GET /api/v1/players/top-paced
+// @desc    Fetch recently added player records
+// @route   GET /api/v1/players/recent
 // @access  Public
-exports.getTopPaced = asyncHandler(async (req, res, next) => {
-  const players = await Player.find({ isDeleted: false }).sort('-pace').limit(10);
+exports.getRecentPlayers = asyncHandler(async (req, res, next) => {
+  const players = await Player.find({ isDeleted: false }).sort('-createdAt').limit(10);
   res.status(200).json({ success: true, count: players.length, data: players });
+});
+
+// @desc    Fetch trending football players (most popular/recent high rated)
+// @route   GET /api/v1/players/trending
+// @access  Public
+exports.getTrendingPlayers = asyncHandler(async (req, res, next) => {
+  const players = await Player.find({ isDeleted: false, ovr: { $gte: 85 } }).sort('-createdAt').limit(10);
+  res.status(200).json({ success: true, count: players.length, data: players });
+});
+
+// @desc    Fetch highest rated young players
+// @route   GET /api/v1/players/top-youngsters
+// @access  Public
+exports.getTopYoungsters = asyncHandler(async (req, res, next) => {
+  const players = await Player.find({ isDeleted: false, age: { $lte: 23 } }).sort('-ovr').limit(10);
+  res.status(200).json({ success: true, count: players.length, data: players });
+});
+
+// @desc    Generate best possible dream team (Top rated per position)
+// @route   GET /api/v1/players/dream-team
+// @access  Public
+exports.getDreamTeam = asyncHandler(async (req, res, next) => {
+  const positions = ['GK', 'LB', 'CB', 'RB', 'LM', 'CM', 'RM', 'LW', 'ST', 'RW'];
+  const dreamTeam = await Promise.all(positions.map(async pos => {
+    return await Player.findOne({ position: pos, isDeleted: false }).sort('-ovr');
+  }));
+
+  res.status(200).json({
+    success: true,
+    data: dreamTeam.filter(p => p !== null)
+  });
 });
 
 // @desc    Fetch best dribbling players
