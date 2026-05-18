@@ -11,17 +11,19 @@ const {
 
 const router = express.Router();
 
+const { protect, authorize } = require('../middlewares/auth');
+
 router.route('/')
   .get(getPlayers)
-  .post(createPlayer);
+  .post(protect, authorize('admin'), createPlayer);
 
 router.route('/bulk-create')
-  .post(bulkCreatePlayers);
+  .post(protect, authorize('admin'), bulkCreatePlayers);
 
 router.route('/:id')
   .get(getPlayer)
-  .put(updatePlayer)
-  .patch(patchPlayer)
-  .delete(deletePlayer);
+  .put(protect, authorize('admin'), updatePlayer)
+  .patch(protect, authorize('admin'), patchPlayer)
+  .delete(protect, authorize('admin'), deletePlayer);
 
 module.exports = router;
