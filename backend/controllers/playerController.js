@@ -284,6 +284,15 @@ exports.getPlayersByAge = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, count: players.length, data: players });
 });
 
+// @desc    Fetch players using gender
+// @route   GET /api/v1/players/gender/:gender
+// @access  Public
+exports.getPlayersByGender = asyncHandler(async (req, res, next) => {
+  const gender = req.params.gender.charAt(0).toUpperCase() + req.params.gender.slice(1).toLowerCase();
+  const players = await Player.find({ gender, isDeleted: false });
+  res.status(200).json({ success: true, count: players.length, data: players });
+});
+
 // @desc    Fetch players by nation
 // @route   GET /api/v1/players/nation/:nation
 // @access  Public
