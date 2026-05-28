@@ -20,7 +20,7 @@ function App() {
       if (token) {
         try {
           const response = await api.get('/auth/me');
-          dispatch(setUser(response.data.user));
+          dispatch(setUser(response.data.data));
         } catch (error) {
           dispatch(logout());
         }
