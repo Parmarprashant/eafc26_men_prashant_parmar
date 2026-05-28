@@ -20,6 +20,7 @@ const PlayersList = lazy(() => import('./pages/PlayersList'));
 const Analytics = lazy(() => import('./pages/Analytics'));
 const UsersManagement = lazy(() => import('./pages/UsersManagement'));
 const Profile = lazy(() => import('./pages/Profile'));
+const PlayerComparison = lazy(() => import('./pages/PlayerComparison'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 
@@ -97,15 +98,26 @@ function App() {
           />
           
           <Route 
-            path="/analytics" 
-            element={
-              <ProtectedRoute>
-                <DashboardLayout>
-                  <Analytics />
-                </DashboardLayout>
-              </ProtectedRoute>
-            } 
-          />
+          path="/analytics" 
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Analytics />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } 
+        />
+
+        <Route 
+          path="/compare" 
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <PlayerComparison />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } 
+        />
           
           <Route 
             path="/profile" 
