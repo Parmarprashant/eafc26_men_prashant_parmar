@@ -16,7 +16,7 @@ exports.getPlayers = asyncHandler(async (req, res, next) => {
 
   // Handle search
   const search = req.query.q || req.query.search;
-  let findQuery = { isDeleted: false };
+  let findQuery = { isDeleted: { $ne: true } };
 
   if (search) {
     findQuery.$or = [
@@ -85,7 +85,7 @@ exports.getPlayers = asyncHandler(async (req, res, next) => {
 exports.getPlayer = asyncHandler(async (req, res, next) => {
   const player = await Player.findById(req.params.id);
 
-  if (!player || player.isDeleted) {
+  if (!player || player.isDeleted === true) {
     return res.status(404).json({
       success: false,
       message: 'Player not found'
@@ -135,7 +135,7 @@ exports.createPlayer = asyncHandler(async (req, res, next) => {
 exports.updatePlayer = asyncHandler(async (req, res, next) => {
   let player = await Player.findById(req.params.id);
 
-  if (!player || player.isDeleted) {
+  if (!player || player.isDeleted === true) {
     return res.status(404).json({
       success: false,
       message: 'Player not found'
@@ -176,7 +176,7 @@ exports.updatePlayer = asyncHandler(async (req, res, next) => {
 exports.deletePlayer = asyncHandler(async (req, res, next) => {
   const player = await Player.findById(req.params.id);
 
-  if (!player || player.isDeleted) {
+  if (!player || player.isDeleted === true) {
     return res.status(404).json({
       success: false,
       message: 'Player not found'

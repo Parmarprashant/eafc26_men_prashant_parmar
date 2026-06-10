@@ -42,11 +42,11 @@ exports.getTopRated = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.getPlayerStats = asyncHandler(async (req, res, next) => {
   const stats = await Player.aggregate([
-    { $match: { isDeleted: false } },
+    { $match: { isDeleted: { $ne: true } } },
     {
       $project: {
-        ovrNum: { $toDouble: "$OVR" },
-        pacNum: { $toDouble: "$PAC" }
+        ovrNum: { $toDouble: { $ifNull: ["$OVR", "0"] } },
+        pacNum: { $toDouble: { $ifNull: ["$PAC", "0"] } }
       }
     },
     {
@@ -72,10 +72,10 @@ exports.getPlayerStats = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.getPositionDistribution = asyncHandler(async (req, res, next) => {
   const distribution = await Player.aggregate([
-    { $match: { isDeleted: false } },
+    { $match: { isDeleted: { $ne: true } } },
     {
       $group: {
-        _id: '$Position',
+        _id: { $ifNull: ['$Position', { $ifNull: ['$POSITION', 'Unknown'] }] },
         count: { $sum: 1 }
       }
     },
@@ -93,16 +93,16 @@ exports.getPositionDistribution = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.getTopTeams = asyncHandler(async (req, res, next) => {
   const teams = await Player.aggregate([
-    { $match: { isDeleted: false } },
+    { $match: { isDeleted: { $ne: true } } },
     {
       $project: {
         Team: 1,
-        ovrNum: { $toDouble: "$OVR" }
+        ovrNum: { $toDouble: { $ifNull: ["$OVR", "0"] } }
       }
     },
     {
       $group: {
-        _id: '$Team',
+        _id: { $ifNull: ['$Team', 'Unknown'] },
         avgRating: { $avg: '$ovrNum' },
         playerCount: { $sum: 1 }
       }
@@ -124,7 +124,7 @@ exports.comparePlayers = asyncHandler(async (req, res, next) => {
   const player1 = await Player.findById(req.params.p1);
   const player2 = await Player.findById(req.params.p2);
 
-  if (!player1 || !player2 || player1.isDeleted || player2.isDeleted) {
+  if (!player1 || !player2 || player1.isDeleted === true || player2.isDeleted === true) {
     return res.status(404).json({ success: false, message: 'One or both players not found' });
   }
 
@@ -138,7 +138,7 @@ exports.comparePlayers = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/stats/analytics/youngest
 // @access  Public
 exports.getYoungestPlayers = asyncHandler(async (req, res, next) => {
-  const players = await Player.find({ isDeleted: false }).sort('Age').limit(10);
+  const players = await Player.find({ isDeleted: { $ne: true } }).sort('Age').limit(10);
   res.status(200).json({ success: true, count: players.length, data: players });
 });
 
@@ -146,7 +146,7 @@ exports.getYoungestPlayers = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/stats/analytics/oldest
 // @access  Public
 exports.getOldestPlayers = asyncHandler(async (req, res, next) => {
-  const players = await Player.find({ isDeleted: false }).sort('-Age').limit(10);
+  const players = await Player.find({ isDeleted: { $ne: true } }).sort('-Age').limit(10);
   res.status(200).json({ success: true, count: players.length, data: players });
 });
 
@@ -155,10 +155,10 @@ exports.getOldestPlayers = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.getSkillDistribution = asyncHandler(async (req, res, next) => {
   const distribution = await Player.aggregate([
-    { $match: { isDeleted: false } },
+    { $match: { isDeleted: { $ne: true } } },
     {
       $group: {
-        _id: '$Skill Moves',
+        _id: { $ifNull: ['$Skill Moves', 'Unknown'] },
         count: { $sum: 1 }
       }
     },
@@ -172,10 +172,10 @@ exports.getSkillDistribution = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.getFootDistribution = asyncHandler(async (req, res, next) => {
   const distribution = await Player.aggregate([
-    { $match: { isDeleted: false } },
+    { $match: { isDeleted: { $ne: true } } },
     {
       $group: {
-        _id: '$Preferred Foot',
+        _id: { $ifNull: ['$Preferred Foot', 'Unknown'] },
         count: { $sum: 1 }
       }
     }
@@ -197,7 +197,7 @@ exports.getCategoryCounts = asyncHandler(async (req, res, next) => {
   const dbField = category.charAt(0).toUpperCase() + category.slice(1);
 
   const counts = await Player.aggregate([
-    { $match: { isDeleted: false } },
+    { $match: { isDeleted: { $ne: true } } },
     {
       $group: {
         _id: `$${dbField}`,
@@ -218,16 +218,16 @@ exports.getCategoryCounts = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.getNationAnalytics = asyncHandler(async (req, res, next) => {
   const nations = await Player.aggregate([
-    { $match: { isDeleted: false } },
+    { $match: { isDeleted: { $ne: true } } },
     {
       $project: {
         Nation: 1,
-        ovrNum: { $toDouble: "$OVR" }
+        ovrNum: { $toDouble: { $ifNull: ["$OVR", "0"] } }
       }
     },
     {
       $group: {
-        _id: '$Nation',
+        _id: { $ifNull: ['$Nation', 'Unknown'] },
         avgRating: { $avg: '$ovrNum' },
         count: { $sum: 1 }
       }
@@ -243,7 +243,7 @@ exports.getNationAnalytics = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.getPlaystyleDistribution = asyncHandler(async (req, res, next) => {
   const distribution = await Player.aggregate([
-    { $match: { isDeleted: false } },
+    { $match: { isDeleted: { $ne: true } } },
     { $unwind: '$Playstyles' },
     {
       $group: {
