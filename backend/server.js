@@ -3,8 +3,8 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
-const connectDB = require('./config/db');
-const errorHandler = require('./middlewares/error');
+const connectDB = require('./src/config/db');
+const errorHandler = require('./src/middlewares/error');
 
 // Load env vars
 dotenv.config();
@@ -13,10 +13,10 @@ dotenv.config();
 connectDB();
 
 // Route files
-const players = require('./routes/playerRoutes');
-const stats = require('./routes/statsRoutes');
-const auth = require('./routes/authRoutes');
-const admin = require('./routes/adminRoutes');
+const players = require('./src/routes/playerRoutes');
+const stats = require('./src/routes/statsRoutes');
+const auth = require('./src/routes/authRoutes');
+const admin = require('./src/routes/adminRoutes');
 
 const app = express();
 
