@@ -33,6 +33,14 @@ exports.getPlayers = asyncHandler(async (req, res, next) => {
   if (reqQuery.nation) findQuery.Nation = { $regex: reqQuery.nation, $options: 'i' };
   if (reqQuery.gender) findQuery.GENDER = reqQuery.gender;
 
+  // Handle minovr filter
+  if (req.query.minovr) {
+    // Since OVR is a string, we use $expr with $toDouble for numeric comparison
+    findQuery.$expr = {
+      $gte: [{ $toDouble: "$OVR" }, parseFloat(req.query.minovr)]
+    };
+  }
+
   // Finding resource
   query = Player.find(findQuery);
 
