@@ -35,8 +35,21 @@ app.use((req, res, next) => {
 // Body parser
 app.use(express.json());
 
-// Enable CORS
-app.use(cors());
+// Enable CORS with specific origins
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:5000',
+  'https://eafc26-men-prashant-parmar.onrender.com',
+  process.env.FRONTEND_URL // Add frontend URL from environment
+].filter(Boolean);
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
@@ -50,12 +63,34 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+// Root route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'EA FC 26 Men API Server',
+    status: 'running',
+    version: '1.0.0'
+  });
+});
+
+// API v1 routes
+app.get('/api', (req, res) => {
+  res.json({ message: 'API v1 - Use /api/v1 endpoints' });
+});
+
 // Mount routers
 app.use('/api/v1/players', players);
 app.use('/api/v1/stats', stats);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/admin', admin);
 
+// 404 handler for undefined routes
+app.use((req, res) => {
+  res.status(404).json({
+    message: 'Route not found',
+    path: req.path,
+    method: req.method
+  });
+});
 
 // Error handler middleware
 app.use(errorHandler);
