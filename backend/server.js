@@ -41,6 +41,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5000',
   'https://eafc26-men-prashant-parmar.onrender.com',
+  'https://resonant-rugelach-150666.netlify.app',
   process.env.FRONTEND_URL // Add frontend URL from environment
 ].filter(Boolean);
 
