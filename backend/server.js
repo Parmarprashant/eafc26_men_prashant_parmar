@@ -73,6 +73,11 @@ app.get('/', (req, res) => {
   });
 });
 
+// cron job route
+app.get('/piik',(req,res)=>{
+  res.send("server is running")
+})
+
 // API v1 routes
 app.get('/api', (req, res) => {
   res.json({ message: 'API v1 - Use /api/v1 endpoints' });
